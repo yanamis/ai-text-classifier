@@ -1,7 +1,11 @@
 import numpy as np
 
-from model import tokenizer, max_sequence_length, scaler, model, label_encoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+from model import train_model
+
+# Call the train_model function and pass tokenizer and max_sequence_length as parameters
+tokenizer, max_sequence_length, scaler, model, label_encoder = train_model()
 
 # Example texts to classify
 new_texts = [
