@@ -140,3 +140,5 @@ def train_model():
     loss, accuracy = model.evaluate([test_data, test_sentence_lengths], test_labels)
     print(f'Test Loss: {loss:.4f}')
     print(f'Test Accuracy: {accuracy:.4f}')
+    
+    return tokenizer, max_sequence_length, scaler, model, label_encoder
