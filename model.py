@@ -19,8 +19,8 @@ def train_model():
     random.shuffle(dataset)
 
     # Select a random subset of elements for training and testing
-    train_size = 25000
-    test_size = 5000
+    train_size = 45000
+    test_size = 1
     train_subset = random.sample(dataset, train_size)
     test_subset = random.sample(dataset, test_size)
 
