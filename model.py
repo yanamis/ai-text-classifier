@@ -18,10 +18,24 @@ def train_model():
     # Shuffle the dataset randomly
     random.shuffle(dataset)
 
+    # Separate 'ai' and 'human' texts
+    ai_subset = [data for data in dataset if data['source'] == 'ai']
+    human_subset = [data for data in dataset if data['source'] == 'human']
+
+    # Shuffle 'ai' and 'human' texts randomly
+    random.shuffle(ai_subset)
+    random.shuffle(human_subset)
+
     # Select a random subset of elements for training and testing
-    train_size = 45000
+    train_size = 30000
     test_size = 1
-    train_subset = random.sample(dataset, train_size)
+    train_ai = random.sample(ai_subset, train_size // 2)
+    train_human = random.sample(human_subset, train_size // 2)
+    train_subset = train_ai + train_human
+
+    # Shuffle the combined subset
+    random.shuffle(train_subset)
+
     test_subset = random.sample(dataset, test_size)
 
     # Initialize empty lists for training and testing
@@ -77,8 +91,8 @@ def train_model():
     train_sentence_lengths = scaler.fit_transform(train_sentence_lengths.reshape(-1, 1))
     test_sentence_lengths = scaler.transform(test_sentence_lengths.reshape(-1, 1))
 
-    embedding_dim = 50  # Dimensionality of the GloVe word embeddings
-    glove_path = 'glove.6B.50d.txt'  # Path to the downloaded GloVe file
+    embedding_dim = 50
+    glove_path = 'glove.6B.50d.txt'
 
     # Load pretrained word embeddings
     word_vectors = {}

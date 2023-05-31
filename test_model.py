@@ -14,11 +14,29 @@ def test_model():
     # Shuffle the dataset randomly
     random.shuffle(dataset)
 
+    # Separate 'ai' and 'human' texts
+    ai_subset = [data for data in dataset if data['source'] == 'ai']
+    human_subset = [data for data in dataset if data['source'] == 'human']
+
+    # Shuffle 'ai' and 'human' texts randomly
+    random.shuffle(ai_subset)
+    random.shuffle(human_subset)
+
+    header = ['source', 'id', 'text', 'predicted_label']
+    with open('data.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f, delimiter=";")
+        writer.writerow(header)
+
     # Select a subset of elements for testing
     tokenizer, max_sequence_length, scaler, model, label_encoder = train_model()
-    for i in range(0,1000):
-        test_size = 1000
-        test_subset = random.sample(dataset, test_size)
+    for i in range(0, 20000):
+        test_size = 20000
+        test_ai = [data for data in ai_subset if len(data['text']) >= 1000][:test_size // 2]
+        test_human = [data for data in human_subset if len(data['text']) >= 1000][:test_size // 2]
+        test_subset = test_ai + test_human
+
+        # Shuffle the combined subset
+        random.shuffle(test_subset)
 
         # Initialize empty lists for testing
         test_text = []
@@ -35,7 +53,6 @@ def test_model():
         test_text = np.array(test_text)
         test_sentence_lengths = np.array(test_sentence_lengths)
 
-
         # Tokenize and convert text to sequences
         # tokenizer.fit_on_texts(test_text)
         test_sequences = tokenizer.texts_to_sequences(test_text)
@@ -48,23 +65,20 @@ def test_model():
         test_sentence_lengths = scaler.transform(test_sentence_lengths.reshape(-1, 1))
 
         # Save the results to a CSV file
-        header = ['source', 'id', 'text', 'predicted_label']
         with open('data.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter=";")
-            writer.writerow(header)
             for i in range(len(test_subset)):
-                try:
-                    source = test_subset[i]['source']
-                    id = test_subset[i]['id']
-                    text = test_subset[i]['text']
-                    if len(text) < 1000:
-                        continue
-                    prediction = model.predict([test_data[i:i + 1], test_sentence_lengths[i:i + 1]])[0][0]
-                    predicted_label = label_encoder.inverse_transform(prediction.flatten().round().astype(int))[0]
-                    row = [source, id, text, predicted_label]
-                    writer.writerow(row)
-                except:
-                    continue
+                # try:
+                source = test_subset[i]['source']
+                id = test_subset[i]['id']
+                text = test_subset[i]['text']
+
+                prediction = model.predict([test_data[i:i + 1], test_sentence_lengths[i:i + 1]])[0][0]
+                predicted_label = label_encoder.inverse_transform(prediction.flatten().round().astype(int))[0]
+                row = [source, id, text, predicted_label]
+                writer.writerow(row)
+                # except:
+                    # continue
 
     print("Testing complete. Results saved to data.csv")
 
