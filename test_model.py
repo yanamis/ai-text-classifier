@@ -14,6 +14,11 @@ def test_model():
     # Shuffle the dataset randomly
     random.shuffle(dataset)
 
+    header = ['source', 'id', 'text', 'predicted_label']
+    with open('data.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f, delimiter=";")
+        writer.writerow(header)
+
     # Select a subset of elements for testing
     tokenizer, max_sequence_length, scaler, model, label_encoder = train_model()
     for i in range(0,1000):
@@ -48,10 +53,8 @@ def test_model():
         test_sentence_lengths = scaler.transform(test_sentence_lengths.reshape(-1, 1))
 
         # Save the results to a CSV file
-        header = ['source', 'id', 'text', 'predicted_label']
-        with open('data.csv', 'w', newline='', encoding='utf-8') as f:
+        with open('data.csv', 'a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter=";")
-            writer.writerow(header)
             for i in range(len(test_subset)):
                 try:
                     source = test_subset[i]['source']
