@@ -29,8 +29,8 @@ def test_model():
 
     # Select a subset of elements for testing
     tokenizer, max_sequence_length, scaler, model, label_encoder = train_model()
-    for i in range(0, 20000):
-        test_size = 20000
+    for i in range(0, 1000):
+        test_size = 1000
         test_ai = [data for data in ai_subset if len(data['text']) >= 1000][:test_size // 2]
         test_human = [data for data in human_subset if len(data['text']) >= 1000][:test_size // 2]
         test_subset = test_ai + test_human
@@ -65,20 +65,20 @@ def test_model():
         test_sentence_lengths = scaler.transform(test_sentence_lengths.reshape(-1, 1))
 
         # Save the results to a CSV file
-        with open('data.csv', 'w', newline='', encoding='utf-8') as f:
+        with open('data.csv', 'a', newline='', encoding='utf-8') as f:
             writer = csv.writer(f, delimiter=";")
             for i in range(len(test_subset)):
-                # try:
-                source = test_subset[i]['source']
-                id = test_subset[i]['id']
-                text = test_subset[i]['text']
+                try:
+                    source = test_subset[i]['source']
+                    id = test_subset[i]['id']
+                    text = test_subset[i]['text']
 
-                prediction = model.predict([test_data[i:i + 1], test_sentence_lengths[i:i + 1]])[0][0]
-                predicted_label = label_encoder.inverse_transform(prediction.flatten().round().astype(int))[0]
-                row = [source, id, text, predicted_label]
-                writer.writerow(row)
-                # except:
-                    # continue
+                    prediction = model.predict([test_data[i:i + 1], test_sentence_lengths[i:i + 1]])[0][0]
+                    predicted_label = label_encoder.inverse_transform(prediction.flatten().round().astype(int))[0]
+                    row = [source, id, text, predicted_label]
+                    writer.writerow(row)
+                except:
+                    continue
 
     print("Testing complete. Results saved to data.csv")
 
